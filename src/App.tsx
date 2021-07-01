@@ -7,9 +7,17 @@ import SubMenu from './components/Menu/SubMenu'
 import Icon from './components/Icon/Icon'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { library } from '@fortawesome/fontawesome-svg-core'
+import Upload from './components/Upload/Upload'
 
 library.add(fas)
 function App() {
+  const checkFileSize = (file: File) => {
+    if (Math.round(file.size / 1024) > 50) {
+      alert('file is too big')
+      return false
+    }
+    return true
+  }
   return (
     <div className="App">
       {/* <Button autoFocus className="custom">
@@ -26,7 +34,8 @@ function App() {
           <MenuItem>1</MenuItem>
         </SubMenu>
       </Menu> */}
-      <Icon icon="coffee"></Icon>
+      {/* <Icon icon="coffee"></Icon> */}
+      <Upload action="https://jsonplaceholder.typicode.com/posts" />
     </div>
   )
 }
