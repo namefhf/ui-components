@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { type } from 'os'
 import { useRef, useEffect, EventHandler, useState } from 'react'
 import Button from '../Button/button'
 import UploadList from './uploadList'
