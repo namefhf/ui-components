@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useRef, useEffect, EventHandler, useState } from 'react'
+import { useRef, useState } from 'react'
 import Button from '../Button/button'
 import UploadList from './uploadList'
 
@@ -12,6 +12,12 @@ export interface UploadProps {
   onError?: (err: any, file: File) => void
   onChange?: (file: File) => void
   onRemove?: (file: UploadFile) => void
+  headers?: { [key: string]: any }
+  name?: string
+  data?: { [key: string]: any }
+  withCredentials?: boolean
+  accept?: string
+  multiple?: boolean
 }
 export type UploadFileStatus = 'ready' | 'uploading' | 'success' | 'error'
 export interface UploadFile {
@@ -34,6 +40,12 @@ const Upload: React.FC<UploadProps> = (props) => {
     onSuccess,
     onError,
     onChange,
+    headers,
+    name,
+    data,
+    withCredentials,
+    accept,
+    multiple,
   } = props
   const fileInput = useRef<HTMLInputElement>(null)
   const [fileList, setFileList] = useState<UploadFile[]>(defaultFileList || [])
@@ -73,14 +85,24 @@ const Upload: React.FC<UploadProps> = (props) => {
       percent: 0,
       raw: file,
     }
-    setFileList([_file, ...fileList])
+    // setFileList([_file, ...fileList])
+    setFileList((prevList) => {
+      return [_file, ...prevList]
+    })
     const fd = new FormData()
-    fd.append(file.name, file)
+    fd.append(name || 'file', file)
+    if (data) {
+      Object.keys(data).forEach((key) => {
+        fd.append(key, data[key])
+      })
+    }
     axios
       .post(action, fd, {
         headers: {
+          ...headers,
           'Content-Type': 'multipart/form-data',
         },
+        withCredentials,
         onUploadProgress: (e) => {
           let percentage = Math.round((e.loaded * 100) / e.total) || 0
           if (percentage < 100) {
@@ -151,10 +173,14 @@ const Upload: React.FC<UploadProps> = (props) => {
         onChange={handleChange}
         name="file"
         style={{ display: 'none' }}
+        multiple={multiple}
+        accept={accept}
       />
       <UploadList fileList={fileList} onRemove={handleRemove} />
     </div>
   )
 }
-
+Upload.defaultProps = {
+  name: 'file',
+}
 export default Upload
